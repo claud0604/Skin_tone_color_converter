@@ -86,6 +86,13 @@
             text-align: center;
             font-size: 16px;
             transition: all 0.3s;
+            -moz-appearance: textfield; /* Firefox에서 기본 화살표 제거 */
+        }
+        
+        input[type="number"]::-webkit-inner-spin-button, 
+        input[type="number"]::-webkit-outer-spin-button { 
+            -webkit-appearance: none;
+            margin: 0;
         }
         
         input[type="number"]:focus {
@@ -145,7 +152,44 @@
         }
         
         .info-item {
-            margin-bottom: 5px;
+            margin-bottom: 12px;
+            line-height: 1.5;
+        }
+        
+        .tone-number {
+            font-size: 22px;
+            font-weight: bold;
+            color: var(--primary);
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 5px;
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 0 5px;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            display: inline-block;
+            min-width: 80px;
+        }
+        
+        .value-normal {
+            font-weight: normal;
+            color: #666;
+        }
+        
+        .value-highlight {
+            font-weight: bold;
+            color: var(--dark);
+        }
+        
+        .result-conclusion {
+            margin-top: 15px;
+            padding: 12px;
+            background-color: #fff;
+            border-left: 4px solid var(--primary);
+            border-radius: 0 5px 5px 0;
         }
         
         .history-item {
@@ -288,15 +332,15 @@
                 <div class="input-container">
                     <div class="input-field">
                         <label for="skin-l">L (밝기)</label>
-                        <input type="number" id="skin-l" placeholder="50-80" step="0.01">
+                        <input type="number" id="skin-l" placeholder="50-80" step="0.01" pattern="[0-9]*" inputmode="decimal">
                     </div>
                     <div class="input-field">
                         <label for="skin-a">a (붉은기)</label>
-                        <input type="number" id="skin-a" placeholder="5-20" step="0.01">
+                        <input type="number" id="skin-a" placeholder="5-20" step="0.01" pattern="[0-9]*" inputmode="decimal">
                     </div>
                     <div class="input-field">
                         <label for="skin-b">b (노란기)</label>
-                        <input type="number" id="skin-b" placeholder="10-30" step="0.01">
+                        <input type="number" id="skin-b" placeholder="10-30" step="0.01" pattern="[0-9]*" inputmode="decimal">
                     </div>
                 </div>
                 
@@ -553,11 +597,30 @@
                 <h3>피부 톤 분석 결과</h3>
                 <div class="color-box" style="background-color: ${rgb.css};"></div>
                 <div class="skin-tone-info">
-                    <div class="info-item"><strong>LAB 값:</strong> L=${L.toFixed(1)}, a=${a.toFixed(1)}, b=${b.toFixed(1)}</div>
-                    <div class="info-item"><strong>피부 톤:</strong> ${tone}</div>
-                    <div class="info-item"><strong>붉은기:</strong> ${a < aAvg ? "평균보다 적음" : "평균보다 많음"} (평균: 13~15)</div>
-                    <div class="info-item"><strong>노란기:</strong> ${b < bAvg ? "평균보다 적음" : "평균보다 많음"} (평균: 19~21)</div>
-                    <div class="info-item"><strong>결론:</strong> ${tone}이며, ${colorTendency}입니다.</div>
+                    <div class="info-item">
+                        <span class="result-label">LAB 값:</span> 
+                        L=${L.toFixed(2)}, a=${a.toFixed(2)}, b=${b.toFixed(2)}
+                    </div>
+                    <div class="info-item">
+                        <span class="result-label">피부 톤:</span> 
+                        <span class="tone-number">${tone}</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="result-label">붉은기:</span> 
+                        <span class="${a < aAvg ? 'value-highlight' : 'value-normal'}">평균보다 적음</span> / 
+                        <span class="${a >= aAvg ? 'value-highlight' : 'value-normal'}">평균보다 많음</span> 
+                        <span class="value-normal">(평균: 13~15)</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="result-label">노란기:</span> 
+                        <span class="${b < bAvg ? 'value-highlight' : 'value-normal'}">평균보다 적음</span> / 
+                        <span class="${b >= bAvg ? 'value-highlight' : 'value-normal'}">평균보다 많음</span>
+                        <span class="value-normal">(평균: 19~21)</span>
+                    </div>
+                    <div class="result-conclusion">
+                        <strong>결론:</strong> 피부 톤은 <span class="tone-number">${tone}</span>이며, 
+                        <span class="value-highlight">${colorTendency}</span>입니다.
+                    </div>
                 </div>
             `;
             
