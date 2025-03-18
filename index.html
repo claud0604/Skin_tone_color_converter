@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LAB 피부 톤 분석기</title>
+    <style>
+        :root {
+            --primary: #ff8ba7;
+            --secondary: #ffc6c7;
+            --light: #faeee7;
+            --dark: #33272a;
+            --accent: #594a4e;
+        }
+        
+        body {
+            font-family: 'Noto Sans KR', Arial, sans-serif;
+            background-color: var(--light);
+            color: var(--dark);
+            margin: 0;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            color: var(--dark);
+            text-align: center;
+        }
+        
+        h1 {
+            margin-bottom: 20px;
+            color: var(--primary);
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .tab {
+            flex: 1;
+            padding: 10px;
+            text-align: center;
+            background-color: var(--secondary);
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
+        
+        .tab.active {
+            background-color: var(--primary);
+            color: white;
+        }
+        
+        .input-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin: 25px 0;
+        }
+        
+        .input-field {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        input[type="number"] {
+            width: 80px;
+            padding: 12px;
+            border: 2px solid var(--secondary);
+            border-radius: 5px;
+            text-align: center;
+            font-size: 16px;
+            transition: all 0.3s;
+        }
+        
+        input[type="number"]:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 5px rgba(255,139,167,0.5);
+        }
+        
+        label {
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: var(--accent);
+        }
+        
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        
+        button:hover {
+            background-color: #e7758f;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 10px rgba(0,0,0,0.1);
+        }
+        
+        .result-container, .history-container {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.05);
+        }
+        
+        .color-box {
+            width: 120px;
+            height: 120px;
+            margin: 15px auto;
+            border-radius: 50%;
+            border: 3px solid #ddd;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .skin-tone-info {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 15px;
+            text-align: left;
+        }
+        
+        .info-item {
+            margin-bottom: 5px;
+        }
+        
+        .history-item {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .mini-color {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 15px;
+            border: 2px solid #ddd;
+        }
+        
+        .history-text {
+            flex: 1;
+        }
+        
+        .clear-btn {
+            background-color: var(--accent);
+            padding: 8px 15px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        
+        .tabs-content > div {
+            display: none;
+        }
+        
+        .tabs-content > div.active {
+            display: block;
+        }
+        
+        .info-box {
+            background-color: #fff5f6;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        
+        table, th, td {
+            border: 1px solid #ddd;
+        }
+        
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        
+        th {
+            background-color: var(--secondary);
+            color: var(--dark);
+        }
+        
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>LAB 피부 톤 분석기</h1>
+        
+        <div class="tabs">
+            <div class="tab active" data-tab="converter">색상 변환</div>
+            <div class="tab" data-tab="analyzer">피부 톤 분석</div>
+            <div class="tab" data-tab="info">정보</div>
+        </div>
+        
+        <div class="tabs-content">
+            <!-- 색상 변환 탭 -->
+            <div class="active" id="converter">
+                <h2>LAB ↔ RGB 색상 변환</h2>
+                
+                <div class="input-container">
+                    <div class="input-field">
+                        <label for="convert-mode-lab">
+                            <input type="radio" id="convert-mode-lab" name="colorMode" value="lab" checked> LAB → RGB
+                        </label>
+                    </div>
+                    <div class="input-field">
+                        <label for="convert-mode-rgb">
+                            <input type="radio" id="convert-mode-rgb" name="colorMode" value="rgb"> RGB → LAB
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="input-container">
+                    <div class="input-field">
+                        <label for="input1">L / R</label>
+                        <input type="number" id="input1" placeholder="0-100" step="0.01">
+                    </div>
+                    <div class="input-field">
+                        <label for="input2">a / G</label>
+                        <input type="number" id="input2" placeholder="-128-127" step="0.01">
+                    </div>
+                    <div class="input-field">
+                        <label for="input3">b / B</label>
+                        <input type="number" id="input3" placeholder="-128-127" step="0.01">
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button onclick="convertColor()">변환하기</button>
+                </div>
+                
+                <div class="result-container" id="resultContainer">
+                    <h3>변환 결과</h3>
+                    <p>값을 입력하고 변환 버튼을 클릭하세요.</p>
+                </div>
+                
+                <div class="history-container">
+                    <h3>변환 기록</h3>
+                    <button class="clear-btn" onclick="clearHistory('conversionHistory')">기록 지우기</button>
+                    <div id="conversionHistory"></div>
+                </div>
+            </div>
+            
+            <!-- 피부 톤 분석 탭 -->
+            <div id="analyzer">
+                <h2>피부 톤 분석</h2>
+                
+                <div class="info-box">
+                    <p>컬러미터 측정을 통해 얻은 L, a, b 값을 입력하여 피부 톤을 분석합니다.</p>
+                </div>
+                
+                <div class="input-container">
+                    <div class="input-field">
+                        <label for="skin-l">L (밝기)</label>
+                        <input type="number" id="skin-l" placeholder="50-80" step="0.01">
+                    </div>
+                    <div class="input-field">
+                        <label for="skin-a">a (붉은기)</label>
+                        <input type="number" id="skin-a" placeholder="5-20" step="0.01">
+                    </div>
+                    <div class="input-field">
+                        <label for="skin-b">b (노란기)</label>
+                        <input type="number" id="skin-b" placeholder="10-30" step="0.01">
+                    </div>
+                </div>
+                
+                <div style="text-align: center;">
+                    <button onclick="analyzeSkinTone()">분석하기</button>
+                </div>
+                
+                <div class="result-container" id="skinToneResult">
+                    <h3>분석 결과</h3>
+                    <p>피부 톤 값을 입력하고 분석 버튼을 클릭하세요.</p>
+                </div>
+                
+                <div class="history-container">
+                    <h3>분석 기록</h3>
+                    <button class="clear-btn" onclick="clearHistory('analysisHistory')">기록 지우기</button>
+                    <div id="analysisHistory"></div>
+                </div>
+            </div>
+            
+            <!-- 정보 탭 -->
+            <div id="info">
+                <h2>피부 톤 분석 정보</h2>
+                
+                <div class="info-box">
+                    <h3>L, a, b 값의 의미</h3>
+                    <p><strong>L (밝기):</strong> 피부의 밝기를 나타내는 값입니다. 숫자가 클수록 피부가 밝고, 숫자가 작을수록 피부가 어둡습니다.</p>
+                    <p><strong>a (붉은기):</strong> 피부의 붉은색 정도를 나타냅니다. 숫자가 클수록 붉은기가 많고, 숫자가 작을수록 붉은기가 적습니다.</p>
+                    <p><strong>b (노란기):</strong> 피부의 노란색 정도를 나타냅니다. 숫자가 클수록 노란기가 많고, 숫자가 작을수록 노란기가 적습니다.</p>
+                </div>
+                
+                <h3>피부 톤 분류 기준</h3>
+                <table>
+                    <tr>
+                        <th>밝기(L) 범위</th>
+                        <th>피부 톤</th>
+                    </tr>
+                    <tr><td>71 이상</td><td>13호 (가장 밝은 톤)</td></tr>
+                    <tr><td>69 ~ 70</td><td>17호</td></tr>
+                    <tr><td>67 ~ 68</td><td>19호</td></tr>
+                    <tr><td>64 ~ 66</td><td>21호</td></tr>
+                    <tr><td>62 ~ 63</td><td>22호</td></tr>
+                    <tr><td>60 ~ 61</td><td>23호</td></tr>
+                    <tr><td>59 이하</td><td>25호 (가장 어두운 톤)</td></tr>
+                </table>
+                
+                <h3>붉은기와 노란기 평균 값</h3>
+                <table>
+                    <tr>
+                        <th>구분</th>
+                        <th>평균 범위</th>
+                    </tr>
+                    <tr><td>붉은기(a)</td><td>13 ~ 15</td></tr>
+                    <tr><td>노란기(b)</td><td>19 ~ 21</td></tr>
+                </table>
+                
+                <div class="info-box">
+                    <h3>분석 방법</h3>
+                    <p>1. 밝기(L) 값을 기준으로 피부 톤 호수를 결정합니다.</p>
+                    <p>2. 붉은기(a)와 노란기(b) 값을 평균과 비교하여 각각 많은지 적은지 판단합니다.</p>
+                    <p>3. 붉은기와 노란기 값이 평균과 얼마나 차이가 나는지 계산해서 상대적으로 어느 쪽이 더 적은지 판단합니다.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // 탭 기능
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                
+                document.querySelectorAll('.tabs-content > div').forEach(content => {
+                    content.classList.remove('active');
+                });
+                
+                document.getElementById(tab.dataset.tab).classList.add('active');
+            });
+        });
+        
+        // RGB ↔ LAB 변환 함수
+        function labToRGB(L, a, b) {
+            let Y = (L + 16) / 116;
+            let X = a / 500 + Y;
+            let Z = Y - b / 200;
+            
+            // XYZ 변환
+            X = 0.95047 * ((X ** 3 > 0.008856) ? X ** 3 : (X - 16 / 116) / 7.787);
+            Y = 1.00000 * ((Y ** 3 > 0.008856) ? Y ** 3 : (Y - 16 / 116) / 7.787);
+            Z = 1.08883 * ((Z ** 3 > 0.008856) ? Z ** 3 : (Z - 16 / 116) / 7.787);
+            
+            // XYZ → RGB
+            let r = X * 3.2406 + Y * -1.5372 + Z * -0.4986;
+            let g = X * -0.9689 + Y * 1.8758 + Z * 0.0415;
+            let b_val = X * 0.0557 + Y * -0.2040 + Z * 1.0570;
+            
+            // RGB 색 보정
+            r = (r > 0.0031308) ? (1.055 * Math.pow(r, (1 / 2.4)) - 0.055) : 12.92 * r;
+            g = (g > 0.0031308) ? (1.055 * Math.pow(g, (1 / 2.4)) - 0.055) : 12.92 * g;
+            b_val = (b_val > 0.0031308) ? (1.055 * Math.pow(b_val, (1 / 2.4)) - 0.055) : 12.92 * b_val;
+            
+            // 0-255 범위로 변환
+            r = Math.min(Math.max(0, r), 1) * 255;
+            g = Math.min(Math.max(0, g), 1) * 255;
+            b_val = Math.min(Math.max(0, b_val), 1) * 255;
+            
+            return {
+                r: Math.round(r),
+                g: Math.round(g),
+                b: Math.round(b_val),
+                css: `rgb(${Math.round(r)}, ${Math.round(g)}, ${Math.round(b_val)})`
+            };
+        }
+        
+        function rgbToLAB(r, g, b) {
+            // RGB → XYZ 변환
+            r = r / 255;
+            g = g / 255;
+            b = b / 255;
+            
+            r = (r > 0.04045) ? Math.pow((r + 0.055) / 1.055, 2.4) : r / 12.92;
+            g = (g > 0.04045) ? Math.pow((g + 0.055) / 1.055, 2.4) : g / 12.92;
+            b = (b > 0.04045) ? Math.pow((b + 0.055) / 1.055, 2.4) : b / 12.92;
+            
+            r = r * 100;
+            g = g * 100;
+            b = b * 100;
+            
+            let X = r * 0.4124 + g * 0.3576 + b * 0.1805;
+            let Y = r * 0.2126 + g * 0.7152 + b * 0.0722;
+            let Z = r * 0.0193 + g * 0.1192 + b * 0.9505;
+            
+            // XYZ → LAB 변환
+            X = X / 95.047;
+            Y = Y / 100.000;
+            Z = Z / 108.883;
+            
+            X = (X > 0.008856) ? Math.pow(X, 1/3) : (7.787 * X) + (16 / 116);
+            Y = (Y > 0.008856) ? Math.pow(Y, 1/3) : (7.787 * Y) + (16 / 116);
+            Z = (Z > 0.008856) ? Math.pow(Z, 1/3) : (7.787 * Z) + (16 / 116);
+            
+            let L = (116 * Y) - 16;
+            let a = 500 * (X - Y);
+            let b_val = 200 * (Y - Z);
+            
+            return {
+                L: parseFloat(L.toFixed(2)),
+                a: parseFloat(a.toFixed(2)),
+                b: parseFloat(b_val.toFixed(2))
+            };
+        }
+        
+        // 색상 변환 실행 함수
+        function convertColor() {
+            const mode = document.querySelector('input[name="colorMode"]:checked').value;
+            const val1 = parseFloat(document.getElementById("input1").value);
+            const val2 = parseFloat(document.getElementById("input2").value);
+            const val3 = parseFloat(document.getElementById("input3").value);
+            
+            if (isNaN(val1) || isNaN(val2) || isNaN(val3)) {
+                alert("올바른 값을 입력하세요.");
+                return;
+            }
+            
+            let result;
+            let htmlResult = "";
+            
+            if (mode === "lab") {
+                // LAB → RGB 변환
+                const rgb = labToRGB(val1, val2, val3);
+                result = `LAB(${val1}, ${val2}, ${val3}) → RGB(${rgb.r}, ${rgb.g}, ${rgb.b})`;
+                
+                htmlResult = `
+                    <h3>변환 결과</h3>
+                    <div class="color-box" style="background-color: ${rgb.css};"></div>
+                    <div class="skin-tone-info">
+                        <div class="info-item"><strong>LAB:</strong> (${val1.toFixed(1)}, ${val2.toFixed(1)}, ${val3.toFixed(1)})</div>
+                        <div class="info-item"><strong>RGB:</strong> (${rgb.r}, ${rgb.g}, ${rgb.b})</div>
+                        <div class="info-item"><strong>CSS 색상:</strong> ${rgb.css}</div>
+                    </div>
+                `;
+                
+                addHistory('conversionHistory', rgb.css, result);
+            } else {
+                // RGB → LAB 변환
+                const lab = rgbToLAB(val1, val2, val3);
+                result = `RGB(${val1}, ${val2}, ${val3}) → LAB(${lab.L}, ${lab.a}, ${lab.b})`;
+                const rgbCss = `rgb(${Math.round(val1)}, ${Math.round(val2)}, ${Math.round(val3)})`;
+                
+                htmlResult = `
+                    <h3>변환 결과</h3>
+                    <div class="color-box" style="background-color: ${rgbCss};"></div>
+                    <div class="skin-tone-info">
+                        <div class="info-item"><strong>RGB:</strong> (${Math.round(val1)}, ${Math.round(val2)}, ${Math.round(val3)})</div>
+                        <div class="info-item"><strong>LAB:</strong> (${lab.L.toFixed(1)}, ${lab.a.toFixed(1)}, ${lab.b.toFixed(1)})</div>
+                        <div class="info-item"><strong>CSS 색상:</strong> ${rgbCss}</div>
+                    </div>
+                `;
+                
+                addHistory('conversionHistory', rgbCss, result);
+            }
+            
+            document.getElementById("resultContainer").innerHTML = htmlResult;
+        }
+        
+        // 피부 톤 분석 함수
+        function analyzeSkinTone() {
+            const L = parseFloat(document.getElementById("skin-l").value);
+            const a = parseFloat(document.getElementById("skin-a").value);
+            const b = parseFloat(document.getElementById("skin-b").value);
+            
+            if (isNaN(L) || isNaN(a) || isNaN(b)) {
+                alert("올바른 값을 입력하세요.");
+                return;
+            }
+            
+            // 톤 결정 (밝기 기준)
+            let tone;
+            if (L >= 71) tone = "13호";
+            else if (L >= 69 && L < 71) tone = "17호";
+            else if (L >= 67 && L < 69) tone = "19호";
+            else if (L >= 64 && L < 67) tone = "21호";
+            else if (L >= 62 && L < 64) tone = "22호";
+            else if (L >= 60 && L < 62) tone = "23호";
+            else tone = "25호";
+            
+            // 붉은기와 노란기 비교
+            const aAvg = 14; // 붉은기 평균 (13~15의 중간값)
+            const bAvg = 20; // 노란기 평균 (19~21의 중간값)
+            
+            const aDiff = Math.abs(a - aAvg);
+            const bDiff = Math.abs(b - bAvg);
+            
+            let colorTendency;
+            if (aDiff > bDiff) {
+                if (a < aAvg) {
+                    colorTendency = "붉은기가 상대적으로 더 적은 타입";
+                } else {
+                    colorTendency = "붉은기가 상대적으로 더 많은 타입";
+                }
+            } else {
+                if (b < bAvg) {
+                    colorTendency = "노란기가 상대적으로 더 적은 타입";
+                } else {
+                    colorTendency = "노란기가 상대적으로 더 많은 타입";
+                }
+            }
+            
+            // RGB 변환 (시각화용)
+            const rgb = labToRGB(L, a, b);
+            
+            // 결과 표시
+            const htmlResult = `
+                <h3>피부 톤 분석 결과</h3>
+                <div class="color-box" style="background-color: ${rgb.css};"></div>
+                <div class="skin-tone-info">
+                    <div class="info-item"><strong>LAB 값:</strong> L=${L.toFixed(1)}, a=${a.toFixed(1)}, b=${b.toFixed(1)}</div>
+                    <div class="info-item"><strong>피부 톤:</strong> ${tone}</div>
+                    <div class="info-item"><strong>붉은기:</strong> ${a < aAvg ? "평균보다 적음" : "평균보다 많음"} (평균: 13~15)</div>
+                    <div class="info-item"><strong>노란기:</strong> ${b < bAvg ? "평균보다 적음" : "평균보다 많음"} (평균: 19~21)</div>
+                    <div class="info-item"><strong>결론:</strong> ${tone}이며, ${colorTendency}입니다.</div>
+                </div>
+            `;
+            
+            document.getElementById("skinToneResult").innerHTML = htmlResult;
+            
+            // 분석 기록 추가
+            const result = `${tone}, ${colorTendency} (L=${L.toFixed(1)}, a=${a.toFixed(1)}, b=${b.toFixed(1)})`;
+            addHistory('analysisHistory', rgb.css, result);
+        }
+        
+        // 기록 추가 함수
+        function addHistory(containerId, color, text) {
+            const container = document.getElementById(containerId);
+            const item = document.createElement("div");
+            item.className = "history-item";
+            item.innerHTML = `
+                <div class="mini-color" style="background-color: ${color};"></div>
+                <div class="history-text">${text}</div>
+            `;
+            container.insertBefore(item, container.firstChild);
+        }
+        
+        // 기록 삭제 함수
+        function clearHistory(containerId) {
+            document.getElementById(containerId).innerHTML = "";
+        }
+    </script>
+</body>
+</html>
