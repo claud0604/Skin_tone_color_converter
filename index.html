@@ -260,9 +260,141 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        
+        /* 숫자 패드 스타일 */
+        .number-pad-container {
+            width: 100%;
+            max-width: 300px;
+            margin: 20px auto;
+            background: #f7f7f7;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 100;
+        }
+        
+        .number-pad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        
+        .number-key {
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+            user-select: none;
+            transition: all 0.15s;
+        }
+        
+        .number-key:hover {
+            background: var(--secondary);
+            color: white;
+        }
+        
+        .number-key:active {
+            transform: scale(0.95);
+            background: var(--primary);
+        }
+        
+        .number-display {
+            background: white;
+            border: 2px solid var(--secondary);
+            padding: 10px;
+            font-size: 18px;
+            text-align: right;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            height: 42px;
+            line-height: 42px;
+        }
+        
+        /* 계절 타입 스타일 */
+        .season-type {
+            font-size: 22px;
+            font-weight: bold;
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        
+        .season-spring {
+            background-color: #FFEDDA;
+            color: #FF8A00;
+            border: 2px solid #FFBD59;
+        }
+        
+        .season-summer {
+            background-color: #E8F4F8;
+            color: #4A99B8;
+            border: 2px solid #A1CCD8;
+        }
+        
+        .season-autumn {
+            background-color: #F7E6D4;
+            color: #9E6B41;
+            border: 2px solid #C1864F;
+        }
+        
+        .season-winter {
+            background-color: #E6E6FA;
+            color: #5D48B6;
+            border: 2px solid #9682D4;
+        }
+        
+        .season-characteristics {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: white;
+            border-radius: 5px;
+            font-style: italic;
+            color: #666;
+        }
+        
+        /* 타이핑 효과 스타일 */
+        @keyframes cursor-blink {
+            0% { opacity: 0; }
+            50% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 0.7em;
+            height: 1.2em;
+            background-color: var(--primary);
+            animation: cursor-blink 1s infinite;
+            vertical-align: middle;
+            margin-left: 2px;
+        }
+        
+        /* 오버레이 */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: none;
+            z-index: 99;
+        }
     </style>
 </head>
 <body>
+    <div class="overlay" id="overlay"></div>
     <div class="container">
         <h1>LAB 피부 톤 분석기</h1>
         
@@ -332,15 +464,38 @@
                 <div class="input-container">
                     <div class="input-field">
                         <label for="skin-l">L (밝기)</label>
-                        <input type="number" id="skin-l" placeholder="50-80" step="0.01" pattern="[0-9]*" inputmode="decimal">
+                        <input type="number" id="skin-l" placeholder="50-80" step="0.01" readonly onclick="showNumpad('skin-l')">
                     </div>
                     <div class="input-field">
                         <label for="skin-a">a (붉은기)</label>
-                        <input type="number" id="skin-a" placeholder="5-20" step="0.01" pattern="[0-9]*" inputmode="decimal">
+                        <input type="number" id="skin-a" placeholder="5-20" step="0.01" readonly onclick="showNumpad('skin-a')">
                     </div>
                     <div class="input-field">
                         <label for="skin-b">b (노란기)</label>
-                        <input type="number" id="skin-b" placeholder="10-30" step="0.01" pattern="[0-9]*" inputmode="decimal">
+                        <input type="number" id="skin-b" placeholder="10-30" step="0.01" readonly onclick="showNumpad('skin-b')">
+                    </div>
+                </div>
+                
+                <!-- 숫자 패드 -->
+                <div class="number-pad-container" id="numpad-container">
+                    <div class="number-display" id="numpad-display">0</div>
+                    <div class="number-pad">
+                        <div class="number-key" onclick="numpadPress('1')">1</div>
+                        <div class="number-key" onclick="numpadPress('2')">2</div>
+                        <div class="number-key" onclick="numpadPress('3')">3</div>
+                        <div class="number-key" onclick="numpadPress('4')">4</div>
+                        <div class="number-key" onclick="numpadPress('5')">5</div>
+                        <div class="number-key" onclick="numpadPress('6')">6</div>
+                        <div class="number-key" onclick="numpadPress('7')">7</div>
+                        <div class="number-key" onclick="numpadPress('8')">8</div>
+                        <div class="number-key" onclick="numpadPress('9')">9</div>
+                        <div class="number-key" onclick="numpadPress('.')">.</div>
+                        <div class="number-key" onclick="numpadPress('0')">0</div>
+                        <div class="number-key" onclick="numpadPress('del')">⌫</div>
+                    </div>
+                    <div style="text-align: center; margin-top: 10px;">
+                        <button onclick="confirmNumpad()">확인</button>
+                        <button onclick="cancelNumpad()" style="background-color: #aaa; margin-left: 10px;">취소</button>
                     </div>
                 </div>
                 
@@ -396,11 +551,41 @@
                     <tr><td>노란기(b)</td><td>19 ~ 21</td></tr>
                 </table>
                 
+                <h3>퍼스널컬러 계절 타입</h3>
+                <table>
+                    <tr>
+                        <th>계절 타입</th>
+                        <th>특성</th>
+                        <th>피부 톤 특징</th>
+                    </tr>
+                    <tr>
+                        <td><span class="season-type season-spring" style="font-size: 16px; padding: 2px 8px;">봄</span></td>
+                        <td>따뜻하고 밝은 톤 (Warm & Bright)</td>
+                        <td>노란기가 강하고 밝은 피부톤</td>
+                    </tr>
+                    <tr>
+                        <td><span class="season-type season-summer" style="font-size: 16px; padding: 2px 8px;">여름</span></td>
+                        <td>차갑고 밝은 톤 (Cool & Bright)</td>
+                        <td>붉은기가 적당하고 밝은 피부톤</td>
+                    </tr>
+                    <tr>
+                        <td><span class="season-type season-autumn" style="font-size: 16px; padding: 2px 8px;">가을</span></td>
+                        <td>따뜻하고 어두운 톤 (Warm & Muted)</td>
+                        <td>노란기가 강하고 어두운 피부톤</td>
+                    </tr>
+                    <tr>
+                        <td><span class="season-type season-winter" style="font-size: 16px; padding: 2px 8px;">겨울</span></td>
+                        <td>차갑고 선명한 톤 (Cool & Clear)</td>
+                        <td>붉은기가 있고 어두운 피부톤</td>
+                    </tr>
+                </table>
+                
                 <div class="info-box">
                     <h3>분석 방법</h3>
                     <p>1. 밝기(L) 값을 기준으로 피부 톤 호수를 결정합니다.</p>
                     <p>2. 붉은기(a)와 노란기(b) 값을 평균과 비교하여 각각 많은지 적은지 판단합니다.</p>
                     <p>3. 붉은기와 노란기 값이 평균과 얼마나 차이가 나는지 계산해서 상대적으로 어느 쪽이 더 적은지 판단합니다.</p>
+                    <p>4. L, a, b 값을 기반으로 퍼스널컬러 계절 타입(봄, 여름, 가을, 겨울)을 추정합니다.</p>
                 </div>
             </div>
         </div>
@@ -499,7 +684,6 @@
             const val1 = parseFloat(document.getElementById("input1").value);
             const val2 = parseFloat(document.getElementById("input2").value);
             const val3 = parseFloat(document.getElementById("input3").value);
-            
             if (isNaN(val1) || isNaN(val2) || isNaN(val3)) {
                 alert("올바른 값을 입력하세요.");
                 return;
@@ -517,7 +701,7 @@
                     <h3>변환 결과</h3>
                     <div class="color-box" style="background-color: ${rgb.css};"></div>
                     <div class="skin-tone-info">
-                        <div class="info-item"><strong>LAB:</strong> (${val1.toFixed(1)}, ${val2.toFixed(1)}, ${val3.toFixed(1)})</div>
+                        <div class="info-item"><strong>LAB:</strong> (${val1.toFixed(2)}, ${val2.toFixed(2)}, ${val3.toFixed(2)})</div>
                         <div class="info-item"><strong>RGB:</strong> (${rgb.r}, ${rgb.g}, ${rgb.b})</div>
                         <div class="info-item"><strong>CSS 색상:</strong> ${rgb.css}</div>
                     </div>
@@ -535,7 +719,7 @@
                     <div class="color-box" style="background-color: ${rgbCss};"></div>
                     <div class="skin-tone-info">
                         <div class="info-item"><strong>RGB:</strong> (${Math.round(val1)}, ${Math.round(val2)}, ${Math.round(val3)})</div>
-                        <div class="info-item"><strong>LAB:</strong> (${lab.L.toFixed(1)}, ${lab.a.toFixed(1)}, ${lab.b.toFixed(1)})</div>
+                        <div class="info-item"><strong>LAB:</strong> (${lab.L.toFixed(2)}, ${lab.a.toFixed(2)}, ${lab.b.toFixed(2)})</div>
                         <div class="info-item"><strong>CSS 색상:</strong> ${rgbCss}</div>
                     </div>
                 `;
@@ -544,6 +728,92 @@
             }
             
             document.getElementById("resultContainer").innerHTML = htmlResult;
+        }
+        
+        // 퍼스널컬러 계절 타입 결정 함수
+        function determineSeasonType(L, a, b) {
+            // 온도(Warm/Cool) 판별 - a와 b의 상대적 비교
+            // 낮은 a, 높은 b = 따뜻한 톤(Warm)
+            // 높은 a, 낮은 b = 차가운 톤(Cool)
+            const isWarm = b > a * 1.5; // 노란기가 붉은기보다 1.5배 이상 강하면 따뜻한 톤
+            
+            // 명도 판별 (밝기)
+            const isBright = L >= 65;
+            
+            // 계절 타입 결정
+            if (isWarm && isBright) {
+                return {
+                    season: "spring",
+                    name: "봄",
+                    characteristics: "따뜻하고 밝은 톤 (Warm & Bright)"
+                };
+            } else if (!isWarm && isBright) {
+                return {
+                    season: "summer",
+                    name: "여름",
+                    characteristics: "차갑고 밝은 톤 (Cool & Bright)"
+                };
+            } else if (isWarm && !isBright) {
+                return {
+                    season: "autumn",
+                    name: "가을",
+                    characteristics: "따뜻하고 어두운 톤 (Warm & Muted)"
+                };
+            } else {
+                return {
+                    season: "winter",
+                    name: "겨울",
+                    characteristics: "차갑고 선명한 톤 (Cool & Clear)"
+                };
+            }
+        }
+        
+        // 타이핑 효과 함수
+        function typeWriter(element, text, index = 0, speed = 20, onComplete = null) {
+            // 컨테이너 표시
+            element.style.display = "block";
+            
+            // 타이핑 커서 추가
+            const cursor = document.createElement('span');
+            cursor.className = 'typing-cursor';
+            element.appendChild(cursor);
+            
+            function type() {
+                if (index < text.length) {
+                    // 현재 문자가 HTML 태그의 시작인 경우
+                    if (text.charAt(index) === '<') {
+                        let tagEndIndex = text.indexOf('>', index);
+                        if (tagEndIndex !== -1) {
+                            // 전체 태그 추가
+                            let tag = text.substring(index, tagEndIndex + 1);
+                            element.innerHTML = element.innerHTML.replace(/<span class="typing-cursor"><\/span>$/, "") + tag;
+                            element.appendChild(cursor);
+                            index = tagEndIndex + 1;
+                        } else {
+                            // 닫는 꺽쇠를 찾지 못한 경우
+                            element.innerHTML = element.innerHTML.replace(/<span class="typing-cursor"><\/span>$/, "") + text.charAt(index);
+                            element.appendChild(cursor);
+                            index++;
+                        }
+                    } else {
+                        // 일반 텍스트 추가
+                        element.innerHTML = element.innerHTML.replace(/<span class="typing-cursor"><\/span>$/, "") + text.charAt(index);
+                        element.appendChild(cursor);
+                        index++;
+                    }
+                    
+                    // 계속 타이핑
+                    setTimeout(type, speed);
+                } else {
+                    // 타이핑 완료
+                    if (onComplete) {
+                        onComplete();
+                    }
+                }
+            }
+            
+            // 타이핑 시작
+            type();
         }
         
         // 피부 톤 분석 함수
@@ -589,13 +859,22 @@
                 }
             }
             
+            // 계절 타입 결정
+            const seasonType = determineSeasonType(L, a, b);
+            
             // RGB 변환 (시각화용)
             const rgb = labToRGB(L, a, b);
             
-            // 결과 표시
-            const htmlResult = `
+            // 결과 컨테이너 준비
+            const resultContainer = document.getElementById("skinToneResult");
+            resultContainer.innerHTML = `
                 <h3>피부 톤 분석 결과</h3>
                 <div class="color-box" style="background-color: ${rgb.css};"></div>
+                <div id="typing-result"></div>
+            `;
+            
+            // 타이핑될 텍스트 준비
+            const resultText = `
                 <div class="skin-tone-info">
                     <div class="info-item">
                         <span class="result-label">LAB 값:</span> 
@@ -617,18 +896,106 @@
                         <span class="${b >= bAvg ? 'value-highlight' : 'value-normal'}">평균보다 많음</span>
                         <span class="value-normal">(평균: 19~21)</span>
                     </div>
+                    <div class="info-item">
+                        <span class="result-label">계절 타입:</span>
+                        <span class="season-type season-${seasonType.season}">${seasonType.name} 타입</span>
+                        <div class="season-characteristics">${seasonType.characteristics}</div>
+                    </div>
                     <div class="result-conclusion">
                         <strong>결론:</strong> 피부 톤은 <span class="tone-number">${tone}</span>이며, 
-                        <span class="value-highlight">${colorTendency}</span>입니다.
+                        <span class="value-highlight">${colorTendency}</span>입니다.<br>
+                        퍼스널컬러는 <span class="season-type season-${seasonType.season}">${seasonType.name} 타입</span>으로 추정됩니다.
                     </div>
                 </div>
             `;
             
-            document.getElementById("skinToneResult").innerHTML = htmlResult;
+            // 타이핑 효과 적용
+            const typingElement = document.getElementById("typing-result");
+            typeWriter(typingElement, resultText);
             
             // 분석 기록 추가
-            const result = `${tone}, ${colorTendency} (L=${L.toFixed(1)}, a=${a.toFixed(1)}, b=${b.toFixed(1)})`;
+            const result = `${tone}, ${seasonType.name} 타입 (L=${L.toFixed(2)}, a=${a.toFixed(2)}, b=${b.toFixed(2)})`;
             addHistory('analysisHistory', rgb.css, result);
+        }
+        
+        // 숫자 패드 관련 변수
+        let currentInput = null;
+        let currentValue = "";
+        
+        // 숫자 패드 표시
+        function showNumpad(inputId) {
+            currentInput = inputId;
+            const input = document.getElementById(inputId);
+            currentValue = input.value || "0";
+            
+            // 소수점이 있는지 확인하고 소수점 이하 자릿수를 조정
+            if (currentValue.includes('.')) {
+                const parts = currentValue.split('.');
+                if (parts[1] && parts[1].length < 2) {
+                    // 소수점 이하가 2자리 미만이면 0을 추가하여 2자리로 만듦
+                    currentValue = parseFloat(currentValue).toFixed(2);
+                }
+            }
+            
+            document.getElementById('numpad-display').innerText = currentValue;
+            document.getElementById('numpad-container').style.display = 'block';
+            document.getElementById('overlay').style.display = 'block';
+        }
+        
+        // 숫자 패드 숫자 입력
+        function numpadPress(key) {
+            const display = document.getElementById('numpad-display');
+            
+            if (key === 'del') {
+                // 백스페이스
+                if (currentValue.length <= 1) {
+                    currentValue = "0";
+                } else {
+                    currentValue = currentValue.slice(0, -1);
+                }
+            } else if (key === '.') {
+                // 소수점
+                if (!currentValue.includes('.')) {
+                    currentValue += '.';
+                }
+            } else {
+                // 숫자
+                if (currentValue === "0") {
+                    currentValue = key;
+                } else {
+                    // 소수점 이하 2자리까지만 입력 가능
+                    if (currentValue.includes('.')) {
+                        const parts = currentValue.split('.');
+                        if (parts[1] && parts[1].length < 2) {
+                            currentValue += key;
+                        } else if (!parts[1]) {
+                            currentValue += key;
+                        }
+                    } else {
+                        currentValue += key;
+                    }
+                }
+            }
+            
+            display.innerText = currentValue;
+        }
+        
+        // 숫자 패드 확인
+        function confirmNumpad() {
+            if (currentInput) {
+                const value = parseFloat(currentValue);
+                if (!isNaN(value)) {
+                    document.getElementById(currentInput).value = value.toFixed(2);
+                }
+                document.getElementById('numpad-container').style.display = 'none';
+                document.getElementById('overlay').style.display = 'none';
+            }
+        }
+        
+        // 숫자 패드 취소
+        function cancelNumpad() {
+            document.getElementById('numpad-container').style.display = 'none';
+            document.getElementById('overlay').style.display = 'none';
         }
         
         // 기록 추가 함수
@@ -647,6 +1014,18 @@
         function clearHistory(containerId) {
             document.getElementById(containerId).innerHTML = "";
         }
+        
+        // 이벤트 리스너 - ESC 키로 숫자 패드 닫기
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && document.getElementById('numpad-container').style.display === 'block') {
+                cancelNumpad();
+            }
+        });
+        
+        // 오버레이 클릭 시 숫자 패드 닫기
+        document.getElementById('overlay').addEventListener('click', function() {
+            cancelNumpad();
+        });
     </script>
 </body>
 </html>
