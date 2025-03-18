@@ -326,6 +326,12 @@
             margin: 20px 0;
             border-radius: 0 5px 5px 0;
         }
+
+        /* 마크다운 강조 스타일 */
+        .typing-content strong {
+            font-weight: bold;
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -612,11 +618,15 @@
             }
         }
         
-        // 타이핑 효과 함수
+        // 타이핑 효과 함수 (커서 자동 스크롤 추가)
         function typeText(text, speed = 10) {
             return new Promise((resolve) => {
                 const typingContent = document.getElementById("typingContent");
+                const modalContent = document.querySelector(".modal-content");
                 const modal = document.getElementById("typingModal");
+                
+                // 텍스트에서 마크다운 ** 형식을 <strong> 태그로 변환
+                text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
                 
                 typingContent.innerHTML = '';
                 modal.style.display = "block";
@@ -630,11 +640,36 @@
                 
                 const type = () => {
                     if (i < text.length) {
-                        // 커서를 제거하고 글자 추가 후 다시 커서 추가
-                        typingContent.removeChild(cursor);
-                        typingContent.innerHTML += text.charAt(i);
-                        typingContent.appendChild(cursor);
-                        i++;
+                        // HTML 태그 처리
+                        if (text.charAt(i) === '<') {
+                            // HTML 태그의 끝을 찾기
+                            let tagEndIndex = text.indexOf('>', i);
+                            if (tagEndIndex !== -1) {
+                                // 커서 제거
+                                typingContent.removeChild(cursor);
+                                // 전체 태그 추가
+                                typingContent.innerHTML += text.substring(i, tagEndIndex + 1);
+                                // 커서 다시 추가
+                                typingContent.appendChild(cursor);
+                                i = tagEndIndex + 1;
+                            } else {
+                                // 태그가 아닌 경우
+                                typingContent.removeChild(cursor);
+                                typingContent.innerHTML += text.charAt(i);
+                                typingContent.appendChild(cursor);
+                                i++;
+                            }
+                        } else {
+                            // 일반 텍스트 처리
+                            typingContent.removeChild(cursor);
+                            typingContent.innerHTML += text.charAt(i);
+                            typingContent.appendChild(cursor);
+                            i++;
+                        }
+                        
+                        // 커서로 자동 스크롤
+                        cursor.scrollIntoView({ behavior: 'smooth', block: 'end' });
+                        
                         setTimeout(type, speed);
                     } else {
                         // 타이핑 완료
