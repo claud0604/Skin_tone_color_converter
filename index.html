@@ -229,57 +229,6 @@
             display: block;
         }
         
-        .info-box {
-            background-color: #fff5f6;
-            border-left: 4px solid var(--primary);
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 0 5px 5px 0;
-        }
-        
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 15px 0;
-        }
-        
-        table, th, td {
-            border: 1px solid #ddd;
-        }
-        
-        th, td {
-            padding: 10px;
-            text-align: center;
-        }
-        
-        th {
-            background-color: var(--secondary);
-            color: var(--dark);
-        }
-        
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
-        }
-        
-        /* 타이핑 효과 관련 스타일 */
-        .typing-effect {
-            border-right: 0.15em solid var(--primary);
-            white-space: pre-wrap;
-            overflow: hidden;
-            width: 0;
-            animation: typing 1.5s steps(40, end) forwards;
-        }
-        
-        @keyframes typing {
-            from { width: 0 }
-            to { width: 100% }
-        }
-        
-        @keyframes blink-caret {
-            from, to { border-color: transparent }
-            50% { border-color: var(--primary) }
-        }
-        
         /* 계절 타입 스타일 */
         .season-type {
             font-size: 22px;
@@ -322,6 +271,61 @@
             font-style: italic;
             color: #666;
         }
+        
+        /* 타이핑 효과 모달 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+        
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 20px;
+            border-radius: 10px;
+            width: 80%;
+            max-width: 700px;
+            max-height: 70vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            font-size: 16px;
+            line-height: 1.6;
+        }
+        
+        .typing-content {
+            white-space: pre-wrap;
+            font-family: 'Consolas', monospace;
+        }
+        
+        .typing-cursor {
+            display: inline-block;
+            width: 10px;
+            height: 20px;
+            background-color: var(--primary);
+            animation: blink 0.7s infinite;
+            vertical-align: text-bottom;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        /* 입력 범위 안내 박스 */
+        .info-box {
+            background-color: #fff5f6;
+            border-left: 4px solid var(--primary);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 0 5px 5px 0;
+        }
     </style>
 </head>
 <body>
@@ -331,7 +335,6 @@
         <div class="tabs">
             <div class="tab active" data-tab="converter">색상 변환</div>
             <div class="tab" data-tab="analyzer">피부 톤 분석</div>
-            <div class="tab" data-tab="info">정보</div>
         </div>
         
         <div class="tabs-content">
@@ -421,80 +424,13 @@
                     <div id="analysisHistory"></div>
                 </div>
             </div>
-            
-            <!-- 정보 탭 -->
-            <div id="info">
-                <h2>피부 톤 분석 정보</h2>
-                
-                <div class="info-box">
-                    <h3>L, a, b 값의 의미</h3>
-                    <p><strong>L (밝기):</strong> 피부의 밝기를 나타내는 값입니다. 숫자가 클수록 피부가 밝고, 숫자가 작을수록 피부가 어둡습니다.</p>
-                    <p><strong>a (붉은기):</strong> 피부의 붉은색 정도를 나타냅니다. 숫자가 클수록 붉은기가 많고, 숫자가 작을수록 붉은기가 적습니다.</p>
-                    <p><strong>b (노란기):</strong> 피부의 노란색 정도를 나타냅니다. 숫자가 클수록 노란기가 많고, 숫자가 작을수록 노란기가 적습니다.</p>
-                </div>
-                
-                <h3>피부 톤 분류 기준</h3>
-                <table>
-                    <tr>
-                        <th>밝기(L) 범위</th>
-                        <th>피부 톤</th>
-                    </tr>
-                    <tr><td>71 이상</td><td>13호 (가장 밝은 톤)</td></tr>
-                    <tr><td>69 ~ 70</td><td>17호</td></tr>
-                    <tr><td>67 ~ 68</td><td>19호</td></tr>
-                    <tr><td>64 ~ 66</td><td>21호</td></tr>
-                    <tr><td>62 ~ 63</td><td>22호</td></tr>
-                    <tr><td>60 ~ 61</td><td>23호</td></tr>
-                    <tr><td>59 이하</td><td>25호 (가장 어두운 톤)</td></tr>
-                </table>
-                
-                <h3>붉은기와 노란기 평균 값</h3>
-                <table>
-                    <tr>
-                        <th>구분</th>
-                        <th>평균 범위</th>
-                    </tr>
-                    <tr><td>붉은기(a)</td><td>13 ~ 15</td></tr>
-                    <tr><td>노란기(b)</td><td>19 ~ 21</td></tr>
-                </table>
-                
-                <h3>퍼스널컬러 계절 타입</h3>
-                <table>
-                    <tr>
-                        <th>계절 타입</th>
-                        <th>특성</th>
-                        <th>피부 톤 특징</th>
-                    </tr>
-                    <tr>
-                        <td><span class="season-type season-spring" style="font-size: 16px; padding: 2px 8px;">봄</span></td>
-                        <td>따뜻하고 밝은 톤 (Warm & Bright)</td>
-                        <td>노란기가 강하고 밝은 피부톤</td>
-                    </tr>
-                    <tr>
-                        <td><span class="season-type season-summer" style="font-size: 16px; padding: 2px 8px;">여름</span></td>
-                        <td>차갑고 밝은 톤 (Cool & Bright)</td>
-                        <td>붉은기가 적당하고 밝은 피부톤</td>
-                    </tr>
-                    <tr>
-                        <td><span class="season-type season-autumn" style="font-size: 16px; padding: 2px 8px;">가을</span></td>
-                        <td>따뜻하고 어두운 톤 (Warm & Muted)</td>
-                        <td>노란기가 강하고 어두운 피부톤</td>
-                    </tr>
-                    <tr>
-                        <td><span class="season-type season-winter" style="font-size: 16px; padding: 2px 8px;">겨울</span></td>
-                        <td>차갑고 선명한 톤 (Cool & Clear)</td>
-                        <td>붉은기가 있고 어두운 피부톤</td>
-                    </tr>
-                </table>
-                
-                <div class="info-box">
-                    <h3>분석 방법</h3>
-                    <p>1. 밝기(L) 값을 기준으로 피부 톤 호수를 결정합니다.</p>
-                    <p>2. 붉은기(a)와 노란기(b) 값을 평균과 비교하여 각각 많은지 적은지 판단합니다.</p>
-                    <p>3. 붉은기와 노란기 값이 평균과 얼마나 차이가 나는지 계산해서 상대적으로 어느 쪽이 더 적은지 판단합니다.</p>
-                    <p>4. L, a, b 값을 기반으로 퍼스널컬러 계절 타입(봄, 여름, 가을, 겨울)을 추정합니다.</p>
-                </div>
-            </div>
+        </div>
+    </div>
+    
+    <!-- 타이핑 효과를 위한 모달 -->
+    <div id="typingModal" class="modal">
+        <div class="modal-content">
+            <div id="typingContent" class="typing-content"></div>
         </div>
     </div>
     
@@ -677,25 +613,47 @@
         }
         
         // 타이핑 효과 함수
-        function typeWriter(element, text, speed = 30) {
-            let i = 0;
-            element.innerHTML = '';
-            element.style.width = '0';
-            
-            setTimeout(function type() {
-                if (i < text.length) {
-                    element.innerHTML += text.charAt(i);
-                    i++;
-                    setTimeout(type, speed);
-                } else {
-                    // 타이핑 완료 후 애니메이션 중지
-                    element.style.borderRight = 'none';
-                }
-            }, 300); // 시작 전 짧은 대기 시간
+        function typeText(text, speed = 10) {
+            return new Promise((resolve) => {
+                const typingContent = document.getElementById("typingContent");
+                const modal = document.getElementById("typingModal");
+                
+                typingContent.innerHTML = '';
+                modal.style.display = "block";
+                
+                let i = 0;
+                
+                // 타이핑 커서 추가
+                const cursor = document.createElement('span');
+                cursor.className = 'typing-cursor';
+                typingContent.appendChild(cursor);
+                
+                const type = () => {
+                    if (i < text.length) {
+                        // 커서를 제거하고 글자 추가 후 다시 커서 추가
+                        typingContent.removeChild(cursor);
+                        typingContent.innerHTML += text.charAt(i);
+                        typingContent.appendChild(cursor);
+                        i++;
+                        setTimeout(type, speed);
+                    } else {
+                        // 타이핑 완료
+                        typingContent.removeChild(cursor);
+                        
+                        // 잠시 후 모달 닫기
+                        setTimeout(() => {
+                            modal.style.display = "none";
+                            resolve();
+                        }, 1500);
+                    }
+                };
+                
+                setTimeout(type, 500);
+            });
         }
         
         // 피부 톤 분석 함수
-        function analyzeSkinTone() {
+        async function analyzeSkinTone() {
             const L = parseFloat(document.getElementById("skin-l").value);
             const a = parseFloat(document.getElementById("skin-a").value);
             const b = parseFloat(document.getElementById("skin-b").value);
@@ -743,18 +701,45 @@
             // RGB 변환 (시각화용)
             const rgb = labToRGB(L, a, b);
             
-            // 결과 컨테이너 준비
-            const resultContainer = document.getElementById("skinToneResult");
+            // 타이핑 효과로 분석 과정 보여주기
+            const analysisText = `주어진 **L, a, b** 값을 사용하여 피부 톤을 분석해보겠습니다.
+
+**입력된 값**
+   * **L 값 (밝기): ${L.toFixed(2)}**
+   * **a 값 (붉은기): ${a.toFixed(2)}**
+   * **b 값 (노란기): ${b.toFixed(2)}**
+
+**풀이**
+   1. **L 값으로 밝기 톤 결정하기**:
+      * L = **${L.toFixed(2)}**인 경우, ${getToneRangeText(L, tone)}
+   
+   2. **a와 b 값 평균 비교하기**:
+      * **붉은기(a)**의 평균은 **13~15**입니다. a 값이 **${a.toFixed(2)}**이므로, 평균보다 **${a < aAvg ? (aAvg - a).toFixed(2) + "~" + (aAvg + 1 - a).toFixed(2) + " 낮습니다" : (a - aAvg).toFixed(2) + "~" + (a - (aAvg - 1)).toFixed(2) + " 높습니다"}**.
+      * **노란기(b)**의 평균은 **19~21**입니다. b 값이 **${b.toFixed(2)}**이므로, 평균보다 **${b < bAvg ? (bAvg - b).toFixed(2) + "~" + (bAvg + 1 - b).toFixed(2) + " 낮습니다" : (b - bAvg).toFixed(2) + "~" + (b - (bAvg - 1)).toFixed(2) + " 높습니다"}**.
+   
+   3. **상대적인 차이 계산**:
+      * **붉은기(a)** 값은 평균보다 **${a < aAvg ? (aAvg - a).toFixed(2) + "~" + (aAvg + 1 - a).toFixed(2) + " 낮고" : (a - aAvg).toFixed(2) + "~" + (a - (aAvg - 1)).toFixed(2) + " 높고"}**,
+      * **노란기(b)** 값은 평균보다 **${b < bAvg ? (bAvg - b).toFixed(2) + "~" + (bAvg + 1 - b).toFixed(2) + " 낮습니다" : (b - bAvg).toFixed(2) + "~" + (b - (bAvg - 1)).toFixed(2) + " 높습니다"}**.
+      * ${aDiff > bDiff ? 
+        "**붉은기(a)** 값이 평균보다 더 많이 " + (a < aAvg ? "낮으므로, **붉은기가 상대적으로 더 적습니다**." : "높으므로, **붉은기가 상대적으로 더 많습니다**.") :
+        "**노란기(b)** 값이 평균보다 더 많이 " + (b < bAvg ? "낮으므로, **노란기가 상대적으로 더 적습니다**." : "높으므로, **노란기가 상대적으로 더 많습니다**.")}
+   
+   4. **계절 타입 결정하기**:
+      * 밝기(L) 값이 **${L.toFixed(2)}**로 ${L >= 65 ? "65 이상이므로 **밝은 톤**" : "65 미만이므로 **어두운 톤**"}입니다.
+      * 노란기(b)와 붉은기(a)의 비율을 비교하면 ${b > a * 1.5 ? "노란기가 붉은기의 1.5배보다 크므로 **따뜻한 톤**" : "노란기가 붉은기의 1.5배보다 작으므로 **차가운 톤**"}입니다.
+      * 따라서 퍼스널컬러는 **${seasonType.name} 타입** (${seasonType.characteristics})으로 판단됩니다.
+
+**최종 분석 결과**
+피부 톤은 **${tone}**이며, **${colorTendency}**입니다.
+퍼스널컬러는 **${seasonType.name} 타입**으로 추정됩니다.`;
             
-            // 색상 박스와 타이핑 효과를 위한 컨테이너 생성
-            resultContainer.innerHTML = `
+            // 타이핑 효과 시작
+            await typeText(analysisText);
+            
+            // 타이핑 효과가 끝나면 결과 표시
+            const resultHtml = `
                 <h3>피부 톤 분석 결과</h3>
                 <div class="color-box" style="background-color: ${rgb.css};"></div>
-                <div class="typing-effect" id="typingResult"></div>
-            `;
-            
-            // 표시할 결과 텍스트
-            const resultText = `
                 <div class="skin-tone-info">
                     <div class="info-item">
                         <span class="result-label">LAB 값:</span> 
@@ -789,33 +774,22 @@
                 </div>
             `;
             
-            // 타이핑 효과 적용 (결과 표시할 HTML을 전달)
-            const typingElement = document.getElementById("typingResult");
-            
-            // 타이핑 효과 시작 (간단한 방식으로 처리)
-            setTimeout(() => {
-                // 실제 타이핑을 대신하여 클래스를 교체하는 방식
-                typingElement.innerHTML = resultText;
-                
-                // 타이핑 애니메이션 적용
-                typingElement.classList.add('typing-effect');
-                
-                // 일정 시간 후 애니메이션 모두 제거하고 결과만 표시
-                setTimeout(() => {
-                    typingElement.classList.remove('typing-effect');
-                    
-                    // 결과 컨테이너에 내용 직접 설정 (강조 스타일 유지 위해)
-                    resultContainer.innerHTML = `
-                        <h3>피부 톤 분석 결과</h3>
-                        <div class="color-box" style="background-color: ${rgb.css};"></div>
-                        ${resultText}
-                    `;
-                }, 1500);
-            }, 500);
+            document.getElementById("skinToneResult").innerHTML = resultHtml;
             
             // 분석 기록 추가
             const result = `${tone}, ${seasonType.name} 타입 (L=${L.toFixed(1)}, a=${a.toFixed(1)}, b=${b.toFixed(1)})`;
             addHistory('analysisHistory', rgb.css, result);
+        }
+        
+        // 톤 범위 텍스트 가져오기
+        function getToneRangeText(L, tone) {
+            if (L >= 71) return "L 값이 **71 이상**이므로, **" + tone + "**에 해당합니다.";
+            else if (L >= 69 && L < 71) return "L 값이 **69에서 71** 사이에 있으므로, **" + tone + "**에 해당합니다.";
+            else if (L >= 67 && L < 69) return "L 값이 **67에서 69** 사이에 있으므로, **" + tone + "**에 해당합니다.";
+            else if (L >= 64 && L < 67) return "L 값이 **64에서 67** 사이에 있으므로, **" + tone + "**에 해당합니다.";
+            else if (L >= 62 && L < 64) return "L 값이 **62에서 64** 사이에 있으므로, **" + tone + "**에 해당합니다.";
+            else if (L >= 60 && L < 62) return "L 값이 **60에서 62** 사이에 있으므로, **" + tone + "**에 해당합니다.";
+            else return "L 값이 **59 이하**이므로, **" + tone + "**에 해당합니다.";
         }
         
         // 기록 추가 함수
